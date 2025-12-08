@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KOINZA - Hyper-Filtered E-Commerce</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">
+                    <div class="logo-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path>
+                            <line x1="3" y1="6" x2="21" y2="6"></line>
+                            <path d="M16 10a4 4 0 0 1-8 0"></path>
+                        </svg>
+                    </div>
+                    <span class="logo-text">KOINZA</span>
+                </div>
+                <button class="settings-btn" id="settingsBtn">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="3"></circle>
+                        <path d="M12 1v6m0 6v6m-6-6h12M4.22 4.22l4.24 4.24m7.08 7.08l4.24 4.24M19.78 4.22l-4.24 4.24m-7.08 7.08l-4.24 4.24"></path>
+                    </svg>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main">
+        <div class="container">
+            <!-- Input Stage -->
+            <div id="inputStage" class="stage active">
+                <div class="hero">
+                    <h1 class="hero-title">Find Exactly What You Want</h1>
+                    <p class="hero-subtitle">AI-powered live search across 50+ shops</p>
+                </div>
+
+                <!-- Search Bar -->
+                <div class="search-card">
+                    <div class="search-bar">
+                        <input 
+                            type="text" 
+                            id="searchInput" 
+                            class="search-input" 
+                            placeholder="Try: football boots, wireless headphones, winter jacket..."
+                        >
+                        <button class="search-btn" id="searchBtn">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <circle cx="11" cy="11" r="8"></circle>
+                                <path d="m21 21-4.35-4.35"></path>
+                            </svg>
+                            Search
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Filters -->
+                <div class="filters-grid">
+                    <div class="filter-card">
+                        <label class="filter-label">Price Range</label>
+                        <div class="price-inputs">
+                            <input type="number" id="priceMin" class="filter-input" placeholder="Min $">
+                            <input type="number" id="priceMax" class="filter-input" placeholder="Max $">
+                        </div>
+                    </div>
+
+                    <div class="filter-card">
+                        <label class="filter-label">Brand Preference</label>
+                        <input type="text" id="brand" class="filter-input" placeholder="e.g., Nike, Adidas, Sony">
+                    </div>
+
+                    <div class="filter-card">
+                        <label class="filter-label">Made In</label>
+                        <input type="text" id="country" class="filter-input" placeholder="e.g., USA, India, Germany">
+                    </div>
+
+                    <div class="filter-card">
+                        <label class="filter-label">Delivery</label>
+                        <select id="delivery" class="filter-input">
+                            <option value="standard">Standard</option>
+                            <option value="express">Express (2-day)</option>
+                            <option value="nearby">Nearby Only</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Error Display -->
+                <div id="errorAlert" class="alert error-alert hidden">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <line x1="12" y1="8" x2="12" y2="12"></line>
+                        <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                    </svg>
+                    <span id="errorText"></span>
+                    <button class="alert-close" id="closeError">×</button>
+                </div>
+            </div>
+
+            <!-- Searching Stage -->
+            <div id="searchingStage" class="stage">
+                <div class="searching-container">
+                    <div class="loader-wrapper">
+                        <div class="loader"></div>
+                        <div class="loader-glow"></div>
+                    </div>
+                    <h2 class="searching-title">Live AI Search in Progress</h2>
+                    <p class="searching-text" id="searchProgress"></p>
+                    <p class="searching-note">This may take 30-60 seconds for thorough results</p>
+                </div>
+            </div>
+
+            <!-- Results Stage -->
+            <div id="resultsStage" class="stage">
+                <div class="results-header">
+                    <h2 class="results-title">Top Results</h2>
+                    <button class="new-search-btn" id="newSearchBtn">New Search</button>
+                </div>
+                <div id="resultsGrid" class="results-grid"></div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Settings Modal -->
+    <div id="settingsModal" class="modal hidden">
+        <div class="modal-overlay"></div>
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">Settings</h2>
+                <button class="modal-close" id="closeSettings">×</button>
+            </div>
+            <div class="modal-body">
+                <div class="setting-item">
+                    <label class="setting-label">Search Depth</label>
+                    <input type="number" id="topCount" class="setting-input" value="20" min="5" max="50">
+                    <p class="setting-help">AI will analyze top results before filtering</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Feedback Modal -->
+    <div id="feedbackModal" class="modal hidden">
+        <div class="modal-overlay"></div>
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">What were you looking for?</h2>
+                <button class="modal-close" id="closeFeedback">×</button>
+            </div>
+            <div class="modal-body">
+                <textarea id="feedbackText" class="feedback-textarea" placeholder="Help us improve your results..."></textarea>
+                <div class="modal-actions">
+                    <button class="btn btn-secondary" id="cancelFeedback">Cancel</button>
+                    <button class="btn btn-primary" id="submitFeedback">Submit</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="/static/js/main.js"></script>
+</body>
+</html>
