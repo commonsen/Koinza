@@ -195,7 +195,7 @@ def search_with_serper(query, max_results=10):
                     continue
             
             print(f"✅ Found {len(products)} products from Serper")
-        
+            
     except Exception as e:
         print(f"❌ Serper error: {e}")
     
@@ -387,5 +387,5 @@ def extract_brand(product_name):
     
     return 'Generic'
 
-if __name__ == '__main__':
-    app.run(debug=True, host='0.0.0.0', port=5000)
+# REMOVED: if __name__ == '__main__': block
+# This block runs the development server, which is not needed for Render.
