@@ -1,3 +1,6 @@
+/* KOINZA - Fully Responsive Styles */
+/* Mobile-first approach with perfect scaling */
+
 :root {
     --primary: #8b5cf6;
     --primary-dark: #7c3aed;
@@ -889,5 +892,50 @@ body {
     
     .hero {
         margin-bottom: 1.5rem;
+    }
+}
+
+/* Footer */
+.footer {
+    margin-top: 4rem;
+    padding: 2rem 0;
+    border-top: 1px solid var(--border);
+    text-align: center;
+}
+
+.footer-text {
+    color: #6b7280;
+    font-size: 0.875rem;
+    margin-bottom: 0.5rem;
+}
+
+.footer-text a {
+    color: #9ca3af;
+    text-decoration: none;
+    transition: color 0.2s;
+}
+
+.footer-text a:hover {
+    color: var(--primary);
+}
+
+.footer-beta {
+    color: #6b7280;
+    font-size: 0.75rem;
+    font-style: italic;
+}
+
+@media (max-width: 640px) {
+    .footer {
+        margin-top: 3rem;
+        padding: 1.5rem 0;
+    }
+    
+    .footer-text {
+        font-size: 0.75rem;
+    }
+    
+    .footer-beta {
+        font-size: 0.7rem;
     }
 }
