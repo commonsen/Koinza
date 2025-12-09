@@ -18,9 +18,10 @@ import json
 import re
 import requests
 import time
-
-from dotenv import load_dotenv
+# --- RENDER FIX #1: ADDED DOTENV IMPORT ---
+from dotenv import load_dotenv 
 load_dotenv()
+# ----------------------------------------
 
 app = Flask(__name__)
 CORS(app)
@@ -315,18 +316,26 @@ def perform_real_api_search(query, specs):
     print(f"\n📦 Total products found: {len(all_products)}")
     
     if not all_products:
-        raise Exception("No products found. Please check your API keys or try a different search term.")
+        raise Exception("No products found. Please try a different search term or check API keys.")
+    
+    # Debug: Print first product
+    if all_products:
+        print(f"📝 Sample product: {all_products[0].get('name', 'N/A')[:50]} - ${all_products[0].get('price', 'N/A')}")
     
     # Filter by price
     if specs.get('priceMin') or specs.get('priceMax'):
         min_price = float(specs.get('priceMin', 0))
         max_price = float(specs.get('priceMax', 999999))
-        all_products = [p for p in all_products if min_price <= p['price'] <= max_price]
+        filtered = [p for p in all_products if min_price <= float(p.get('price', 0)) <= max_price]
+        print(f"💰 After price filter: {len(filtered)} products")
+        all_products = filtered if filtered else all_products
     
     # Filter by brand
     if specs.get('brand'):
         brand = specs['brand'].lower()
-        all_products = [p for p in all_products if brand in p['name'].lower()]
+        filtered = [p for p in all_products if brand in p.get('name', '').lower()]
+        print(f"🏷️ After brand filter: {len(filtered)} products")
+        all_products = filtered if filtered else all_products
     
     # Use AI to rank products
     print("\n🧠 AI ranking products...")
@@ -340,7 +349,10 @@ def rank_products_with_ai(query, products, specs):
     """Use Groq AI to rank products"""
     
     if not products:
+        print("⚠️ No products to rank!")
         return []
+    
+    print(f"📊 Ranking {len(products)} products...")
     
     # Take top 15 for ranking
     products_to_rank = products[:15]
@@ -352,26 +364,46 @@ def rank_products_with_ai(query, products, specs):
         reverse=True
     )
     
+    print(f"📋 Sorted {len(sorted_products)} products")
+    
     # Format top 5 products
     final_products = []
     for i, p in enumerate(sorted_products[:5]):
-        final_products.append({
-            'id': i + 1,
-            'name': p['name'],
-            'brand': extract_brand(p['name']),
-            'price': round(p['price'], 2),
-            'originalPrice': None,
-            'discount': 0,
-            'rating': p.get('rating') or 4.0,
-            'reviews': p.get('reviews') or 0,
-            'shipping': 'Standard shipping',
-            'buyLink': p['link'],
-            'source': p['source'],
-            'trending': (p.get('reviews') or 0) > 500,
-            'verified': True,
-            'image': p.get('image')
-        })
+        try:
+            # Make sure price is valid
+            price = p.get('price', 0)
+            if isinstance(price, str):
+                price = float(re.sub(r'[^\d.]', '', price))
+            
+            product = {
+                'id': i + 1,
+                'name': p.get('name', 'Unknown Product'),
+                'brand': extract_brand(p.get('name', '')),
+                'price': round(float(price), 2) if price else 0.0,
+                'originalPrice': None,
+                'discount': 0,
+                'rating': float(p.get('rating') or 4.0),
+                'reviews': int(p.get('reviews') or 0),
+                'shipping': 'Standard shipping',
+                'buyLink': p.get('link', '#'),
+                'source': p.get('source', 'Online Store'),
+                'trending': (p.get('reviews') or 0) > 500,
+                'verified': True,
+                'image': p.get('image', '')
+            }
+            
+            # Only add if price is valid
+            if product['price'] > 0:
+                final_products.append(product)
+                print(f"✅ Added: {product['name'][:50]}... (${product['price']})")
+            else:
+                print(f"⚠️ Skipped (no price): {p.get('name', 'Unknown')[:50]}")
+                
+        except Exception as e:
+            print(f"⚠️ Error formatting product: {e}")
+            continue
     
+    print(f"✅ Final products to return: {len(final_products)}")
     return final_products
 
 def extract_brand(product_name):
@@ -387,5 +419,8 @@ def extract_brand(product_name):
     
     return 'Generic'
 
-# REMOVED: if __name__ == '__main__': block
-# This block runs the development server, which is not needed for Render.
+# --- RENDER FIX #2: REMOVED LOCAL SERVER BLOCK ---
+# if __name__ == '__main__':
+#     app.run(debug=True, host='0.0.0.0', port=5000)
+# This is replaced by the Gunicorn 'start command' on Render.
+# ------------------------------------------------
